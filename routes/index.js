@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var winston = require('winston');
 var Class= require('../models/class');
-
+var cors=require('cors');
 
 winston.add(
   winston.transports.File,{
@@ -24,7 +24,7 @@ router.get('/', function(req, res, next) {
 
 
 /*Get all classes details*/
-router.get('/fetch', function(req, res, next) {
+router.get('/fetch',cors(), function(req, res, next) {
   winston.log('info',"Info: Get all class records")
   console.log("info");
   Class.find({},function(err,data){
@@ -36,8 +36,8 @@ router.get('/fetch', function(req, res, next) {
   })
 });
 
-
-router.get('/class/:Teacher_Id',function(req,res,next){
+/*get */
+router.get('/class/:Teacher_Id',cors(),function(req,res,next){
   winston.log('info',"Info: Get teachers from particular school")
   Class.find({Teacher_Id: req.params.Teacher_Id},function(err,data){
     if(err)
@@ -50,7 +50,7 @@ router.get('/class/:Teacher_Id',function(req,res,next){
 
 
 /*Get particular class details*/
-router.get('/getclass/:Class',function(req,res,next){
+router.get('/getclass/:Class',cors(),function(req,res,next){
   winston.log('info',"Info: Get class details")
   Class.find({Class: req.params.Class},function(err,data){
     if(err)
@@ -63,16 +63,18 @@ router.get('/getclass/:Class',function(req,res,next){
 
 
 
+
 /*Create class*/
-router.post('/add',function(req,res,next){
+router.post('/add',cors(),function(req,res,next){
   winston.log('info',"Info level")
   var t=new Class({
     School_Id:req.body.School_Id,
     Teacher_Id:req.body.Teacher_Id,
+    Teacher_Name:req.body.Teacher_Name,
     Class: req.body.Class,
+    Section:req.body.Section,
     Subject: req.body.Subject,
-    Timings: req.body.Timings,
-    TeacherType: req.body.TeacherType
+    Teacher_Type: req.body.Teacher_Type
   })
   t.save(function(err,suc){
     if(err)
@@ -88,9 +90,21 @@ router.post('/add',function(req,res,next){
 
 
 /*Update class*/
-router.put('/update/:_id', function(req,res,next){
+router.put('/update/:Teacher_Id',cors(), function(req,res,next){
   winston.log('info',"Info level")
-var query={_id: req.params._id};
+var query={Teacher_Id: req.params.Teacher_Id};
+      Class.update(query, req.body, function(err,data){
+                   if(err) res.status(404).json(err);
+                   else {
+                     res.status(202).json(data)
+                   }
+  })
+})
+
+/*UPdate class using teacher name*/
+router.put('/update2/:Teacher_Name', cors(), function(req,res,next){
+  winston.log('info',"Info level")
+var query={Teacher_Name: req.params.Teacher_Name};
       Class.update(query, req.body, function(err,data){
                    if(err) res.status(404).json(err);
                    else {
@@ -102,7 +116,7 @@ var query={_id: req.params._id};
 
 
 /*Delete class*/
-router.get('/delete/:_id',function(req,res){
+router.get('/delete/:_id', cors(),function(req,res){
   winston.log('info',"Info: Delete particular class")
   Class.remove({_id: req.params._id},function(err,data){
     console.log('deleted');
