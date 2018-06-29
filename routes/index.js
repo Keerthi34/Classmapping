@@ -47,6 +47,16 @@ router.get('/class/:Teacher_Id',cors(),function(req,res,next){
     }
   })
 })
+router.get('/c/:_id',cors(),function(req,res,next){
+  winston.log('info',"Info: Get teachers from particular school")
+  Class.find({_id: req.params._id},function(err,data){
+    if(err)
+    res.status(500).send(err);
+    else {
+      res.status(200).json(data);
+    }
+  })
+})
 
 
 /*Get particular class details*/
@@ -61,6 +71,17 @@ router.get('/getclass/:Class',cors(),function(req,res,next){
   })
 })
 
+
+router.get('/getdetails/:Class/:Section',cors(),function(req,res,next){
+  winston.log('info',"Info: Get class details")
+  Class.find({Class: req.params.Class, Section:req.params.Section},function(err,data){
+    if(err)
+    res.status(500).send(err);
+    else {
+      res.status(200).json(data);
+    }
+  })
+})
 
 
 
@@ -100,6 +121,19 @@ var query={Teacher_Id: req.params.Teacher_Id};
                    }
   })
 })
+
+/*Update class*/
+router.put('/u/:_id',cors(), function(req,res,next){
+  winston.log('info',"Info level")
+var query={_id: req.params._id};
+      Class.update(query, req.body, function(err,data){
+                   if(err) res.status(404).json(err);
+                   else {
+                     res.status(202).json(data)
+                   }
+  })
+})
+
 
 /*UPdate class using teacher name*/
 router.put('/update2/:Teacher_Name', cors(), function(req,res,next){
